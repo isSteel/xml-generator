@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>XML Generator v0.1</title>
+        <meta charset="UTF-8">
+        <style>
+            body { margin: 20px 0 0; padding: 0; font: 18px monospace; text-align: center; }
+            form { margin: 0 auto; width: 30%; }
+            fieldset { background-color: #eee; border: 2px solid cadetblue; }
+            legend { color: cadetblue; font-size: 1.2em; }
+            p { margin: 10px 0; }
+            input[type="submit"] {
+                border-radius: 50%;
+                width: 80px;
+                height: 80px;
+                outline: none;
+                border: 2px solid cadetblue;
+                transition: .5s;
+                font: 1.5em bold;
+                margin-top: 15px;
+            }
+            input[type="submit"]:focus { outline: none; transform: scale(.8); }
+            input[type="text"] { height: 20px; border-radius: 5px; border: 2px solid #ccc; }
+            input[type="text"]:focus { border: 2px outset cadetblue; outline: none; }
+        </style>
+    </head>
+    <body>
+        <h2>XML Generator v0.1</h2>
+        <form action="#">
+            <fieldset>
+                <legend>Dynamic fields</legend>
+                    <p>
+                        <label for="login">Login</label><br />
+                        <input type="text" name="login" id="login" required>
+                    </p>
+                    <p>
+                        <label for="mac_addr">MAC-address</label><br />
+                        <input type="text" name="mac_addr" id="mac_addr" required>
+                    </p>
+                    <p>
+                        <label for="ip_addr">IP-address</label><br />
+                        <input type="text" name="ip_addr" id="ip_addr" placeholder="192.168.0.1" required>
+                    </p>
+                    <p>
+                        <label for="netmask">Netmask</label><br />
+                        <input type="text" name="netmask" id="netmask" placeholder="255.255.255.0" required>
+                    </p>
+                    <p>
+                        <label for="gateway">Gateway</label><br />
+                        <input type="text" name="gateway" id="gateway" placeholder="192.168.1.2" required>
+                    </p>
+                    <p>
+                        <label for="dns_addr_1">DNS-addres 1</label><br />
+                        <input type="text" name="dns_addr_1" id="dns_addr_1" placeholder="192.168.11.12" required>
+                    </p>
+                    <p>
+                        <label for="dns_addr_2">DNS-addres 2</label><br />
+                        <input type="text" name="dns_addr_2" id="dns_addr_2" placeholder="8.8.8.8" required>
+                    </p>
+            </fieldset>
+            <p><input type="submit" value="GO!"></p>
+        </form>
+    </body>
+    <script>
+        const server = 'Server'; // <-- set up LOGIN here
+        const pass = 'Password'; // <-- set up PASSWORD here
+        const filename = 'cfgmacaddr.xml'; // <-- set up FILENAME here
+
+        document.forms[0].onsubmit = e => {
+            const link = document.createElement('a');
+
+            const ipParsed = e.target.elements.ip_addr.value.split('.');
+            const maskParsed = e.target.elements.netmask.value.split('.');
+            const gwayParsed = e.target.elements.gateway.value.split('.');
+            const dnsParsed1 = e.target.elements.dns_addr_1.value.split('.');
+            const dnsParsed2 = e.target.elements.dns_addr_2.value.split('.');
+
+            const XML = 
+                `<?xml version="1.0" encoding="UTF-8" ?>
+                <gs_provision version="1">
+                    <mac>${e.target.elements.mac_addr.value}</mac>
+                    <config version="1">
+                        <P271>1</P271>
+                        <P270>Solo</P270>
+                        <P47>${server}</P47>
+                        <P48>${server}</P48>
+                        <P2375>${server}</P2375>
+                        <P3>${e.target.elements.login.value}</P3>
+                        <P35>${e.target.elements.login.value}</P35>
+                        <P36>${e.target.elements.login.value}</P36>
+                        <P34>${pass}</P34>
+                        <P30>NTP SRV</P30>
+                        <P64>EET-2EEST,M3.5.0/3,M10.5.0/4</P64>
+                        <P102>2</P102>
+                        <P340>1</P340>
+                        <P8>1</P8>
+                        <P9>${ipParsed[0]}</P9>
+                        <P10>${ipParsed[1]}</P10>
+                        <P11>${ipParsed[2]}</P11>
+                        <P12>${ipParsed[3]}</P12>
+                        <P13>${maskParsed[0]}</P13>
+                        <P14>${maskParsed[1]}</P14>
+                        <P15>${maskParsed[2]}</P15>
+                        <P16>${maskParsed[3]}</P16>
+                        <P17>${gwayParsed[0]}</P17>
+                        <P18>${gwayParsed[1]}</P18>
+                        <P19>${gwayParsed[2]}</P19>
+                        <P20>${gwayParsed[3]}</P20>
+                        <P22>${dnsParsed1[0]}</P22>
+                        <P21>${dnsParsed1[1]}</P21>
+                        <P23>${dnsParsed1[2]}</P23>
+                        <P24>${dnsParsed1[3]}</P24>
+                        <P25>${dnsParsed2[0]}</P25>
+                        <P26>${dnsParsed2[1]}</P26>
+                        <P27>${dnsParsed2[2]}</P27>
+                        <P28>${dnsParsed2[3]}</P28>
+                    </config>
+                </gs_provision>`;
+            
+            const blob = new Blob([XML.replace(/$\n^ */gm, '\r\n')], {type: 'text/plain'});
+
+            link.setAttribute('href', window.URL.createObjectURL(blob));
+            link.setAttribute('download', filename);
+            link.dataset.downloadurl = ['text/plain', link.download, link.href].join(':');
+            
+            link.click();
+        }
+    </script>
+</html>
