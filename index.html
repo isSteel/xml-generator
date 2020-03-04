@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>XML Generator v0.1</title>
+        <title>XML Generator v0.2.0</title>
         <meta charset="UTF-8">
         <style>
             body { margin: 20px 0 0; padding: 0; font: 18px monospace; text-align: center; }
@@ -11,8 +11,7 @@
             p { margin: 10px 0; }
             input[type="submit"] {
                 border-radius: 50%;
-                width: 80px;
-                height: 80px;
+                padding: 20px 15px;
                 outline: none;
                 border: 2px solid cadetblue;
                 transition: .5s;
@@ -25,7 +24,7 @@
         </style>
     </head>
     <body>
-        <h2>XML Generator v0.1</h2>
+        <h2>XML Generator v0.2.0</h2>
         <form action="#">
             <fieldset>
                 <legend>Dynamic fields</legend>
@@ -64,30 +63,31 @@
     <script>
         const server = 'Server'; // <-- set up LOGIN here
         const pass = 'Password'; // <-- set up PASSWORD here
-        const filename = 'cfgmacaddr.xml'; // <-- set up FILENAME here
 
         document.forms[0].onsubmit = e => {
             const link = document.createElement('a');
 
-            const ipParsed = e.target.elements.ip_addr.value.split('.');
-            const maskParsed = e.target.elements.netmask.value.split('.');
-            const gwayParsed = e.target.elements.gateway.value.split('.');
-            const dnsParsed1 = e.target.elements.dns_addr_1.value.split('.');
-            const dnsParsed2 = e.target.elements.dns_addr_2.value.split('.');
+            const { elements } = e.target;
+
+            const ipParsed = elements.ip_addr.value.split('.');
+            const maskParsed = elements.netmask.value.split('.');
+            const gwayParsed = elements.gateway.value.split('.');
+            const dnsParsed1 = elements.dns_addr_1.value.split('.');
+            const dnsParsed2 = elements.dns_addr_2.value.split('.');
 
             const XML = 
                 `<?xml version="1.0" encoding="UTF-8" ?>
                 <gs_provision version="1">
-                    <mac>${e.target.elements.mac_addr.value}</mac>
+                    <mac>${elements.mac_addr.value}</mac>
                     <config version="1">
                         <P271>1</P271>
                         <P270>Solo</P270>
                         <P47>${server}</P47>
                         <P48>${server}</P48>
                         <P2375>${server}</P2375>
-                        <P3>${e.target.elements.login.value}</P3>
-                        <P35>${e.target.elements.login.value}</P35>
-                        <P36>${e.target.elements.login.value}</P36>
+                        <P3>${elements.login.value}</P3>
+                        <P35>${elements.login.value}</P35>
+                        <P36>${elements.login.value}</P36>
                         <P34>${pass}</P34>
                         <P30>NTP SRV</P30>
                         <P64>EET-2EEST,M3.5.0/3,M10.5.0/4</P64>
@@ -120,7 +120,7 @@
             const blob = new Blob([XML.replace(/$\n^ */gm, '\r\n')], {type: 'text/plain'});
 
             link.setAttribute('href', window.URL.createObjectURL(blob));
-            link.setAttribute('download', filename);
+            link.setAttribute('download', `cfg${elements.mac_addr.value}.xml`);
             link.dataset.downloadurl = ['text/plain', link.download, link.href].join(':');
             
             link.click();
